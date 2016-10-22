@@ -67,6 +67,28 @@ canvas {
 
 .expression {
     background:#B3BF99;
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    padding: 5px;
+}
+
+.expression .operator {
+    font-weight: bold;
+}
+
+.expression .reserved {
+    color: #3F0259;
+}
+
+.expression .identifier {
+    color: #7C03B0;
+    font-style: italic;
+}
+
+.expression .number {
+    color: #496300;
+    font-weight: bold;
 }
 
 .modeButton {

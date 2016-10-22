@@ -14,9 +14,27 @@
 
 function syntHigh(str) {
 
-    return str.replace(/(t|y|=|([A-Za-z_]\w+)|(\d+(\.\d+)?))/g, function (match, g1) {
-        var extraClass = '';
-        return '<span class="synt ' + extraClass + '">' + g1 + '</span>';
+    return str.replace(/(>|<|-|\/|\+|\*|=|([A-Za-z_]\w*)|(\d+(\.\d+)?))/g, function (match, g1) {
+        var className = undefined;
+
+        if (g1 === "-" || g1 === "+" || g1 === "/" || g1 === "*" || g1 === "=" || g1 === ">" || g1 === "<") {
+            className = "operator";
+        } else if (/[A-Za-z_]/.test(g1[0])) {
+            if (g1 === "if" || g1 === "else" || g1 === "sin" || g1 === "cos" || g1 === "acos" || g1 === "floor") {
+                className = "reserved";
+            } else {
+                className = "identifier";
+            }
+        } else if (/\d/.test(g1[0])) {
+            className = "number";
+        }
+
+        if (className) {
+            return '<span class="' + className + '">' + g1 + '</span>';
+        } else {
+            return g1;
+        }
+
     });
 
 }
@@ -148,7 +166,7 @@ function getTweens() {
                 "name": "Attack",
                 "value": 0.2,
                 "min": 0.001,
-                "max": 0.999,                
+                "max": 0.999,
             }
         },
         "func": function (t, p) {

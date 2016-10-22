@@ -113,10 +113,10 @@
 
                             if (param.int) {
                                 param.value = this.value;
-                                document.getElementById('param_' + paramName + '_value').innerText = this.value;
+                                document.getElementById('param_' + key + '_value').innerText = this.value;
                             } else {
                                 param.value = param.min + (param.max - param.min) * (this.value / 100);
-                                document.getElementById('param_' + paramName + '_value').innerText = param.value.toFixed(2);
+                                document.getElementById('param_' + key + '_value').innerText = param.value.toFixed(2);
                             }
                         }
                     })(paramName, currentTween.params[paramName]);
