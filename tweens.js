@@ -76,13 +76,13 @@ function getTweens() {
     });
 
     arr.push({
-        "name": 'sin',
+        "name": 'sine',
         "expression": fmt('y = sin( t * pi / 2 )'),
         "func": function (t) { return Math.sin(t * Math.PI * 0.5); }
     });
 
     arr.push({
-        "name": 'overshoot sin',
+        "name": 'overshoot sine',
         "expression": fmt('y = sin( t * pi / 2 )'),
         "func": function (t) {
             var a = 0.3; // Overshoot factor
@@ -92,8 +92,8 @@ function getTweens() {
 
     arr.push({
         "name": 'step',
-        "expression": fmt('y = floor(t * 10) / 10'),
-        "func": function (t) { return Math.floor(t * 10) / 10; }
+        "expression": fmt('y = floor(t * 5) / 5'),
+        "func": function (t) { return Math.floor(t * 5) / 5; }
     });
 
     arr.push({
@@ -106,13 +106,13 @@ function getTweens() {
         "name": 'spring',
         "expression": fmt('y = sin( acos( 1 - t) )'),
         "func": function (t) {
-            var a = 0.4; //            
+            var a = 0.2; //            
             if (t < a) {
                 nt = t / a;
                 return nt * nt * 2;
             } else {
                 nt = (t - a) / (1 - a);
-                return 1 +  (1 - nt) * Math.cos(nt * nt * Math.PI * 2 * 3);
+                return 1 +  (1 - nt) * Math.cos(nt * Math.PI * 2 * 3);
             }
 
         } //(1-((1-t)*(1-t)*(1-t)*(1-t)))

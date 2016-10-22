@@ -18,8 +18,12 @@
     var paletteCanvasH = 150;
     var paletteCanvasMargin = 25;
 
-    var tweens;
+    var baseTime = undefined;
 
+    var tweens;
+    var panelCanvas;
+
+    var currentTween;
 
     function plotTweenInCanvas(tweenName, canvas, width, height) {
         canvas.width = width;
@@ -30,6 +34,9 @@
 
         var gWidth = width - 2 * paletteCanvasMargin;
         var gHeight = height - 2 * paletteCanvasMargin;
+
+        ctx.fillStyle = "#B3BF99";
+        ctx.fillRect(0,0,width,height);
 
         ctx.beginPath();
         ctx.moveTo(paletteCanvasMargin, paletteCanvasMargin + (1.0 - tween.func(0)) * gHeight);
@@ -45,26 +52,79 @@
 
         var tweensPalette = document.getElementById("tweensPalette");
 
+        var pCount = 1;
+
         for (var tweenName in tweens) {
             var div = document.createElement("div");
 
+            div.className = "tweenPaletteEntry";
+            div.style.order = pCount++;
+
             var canvas = document.createElement("canvas");
-            plotTweenInCanvas(tweenName, canvas, paletteCanvasW, paletteCanvasH);            
+            plotTweenInCanvas(tweenName, canvas, paletteCanvasW, paletteCanvasH);
             div.appendChild(canvas);
 
             var span = document.createElement("span");
             span.innerText = tweenName;
             div.appendChild(span);
 
+            (function (tn) {
+                div.onclick = function () {
+                    setTween(tn);
+                }
+            })(tweenName);
+
             tweensPalette.appendChild(div);
         }
+    }
+
+    function setTween(name) {
+        if (tweens[name]) {
+            currentTween = tweens[name];
+        }
+    }
+
+    function renderPanel(t) {
+        var dt = t - baseTime;
+        var ctx = panelCanvas.getContext("2d");
+
+        var w = panelCanvas.width;
+        var h = panelCanvas.height;
+
+        var ct = dt / 2000;
+        ct = ct - Math.floor(ct);
+        ct = Math.max(0,Math.min(1,(ct*2)-0.5));
+
+        var y = currentTween.func(ct);
+
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(0,0,w,h);
+        ctx.fillStyle = "black";
+
+
+        ctx.beginPath();
+        ctx.arc(75, 75, y * 50, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+    function mainLoop(t) {
+        window.requestAnimationFrame(mainLoop);
+
+        if (!baseTime) { baseTime = t; }
+
+        renderPanel(t);
     }
 
     // Init
     window.onload = function () {
         tweens = getTweens();
+        setTween("linear");
+        panelCanvas = document.getElementById("panelCanvas");
         generatePaletteCanvases();
 
+        window.requestAnimationFrame(mainLoop);
     };
 
 
