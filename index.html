@@ -10,12 +10,26 @@
 	<script src="tweensUI.js"></script>
 
 	<div id="container">
-		<div id="tweensPalette">
+		<div id="leftColumn">
+			<div id="header">
+                <h1>Tweens Cheatsheet</h1>
+                <p> I always keep forgetting the expressions I need to whip up some quick tweens and end up digging old code to look up for them, so I made this mini reference chatsheet to unify them in one place online.</p>
+			</div>
+			<div id="tweensPalette">
+			</div>
 		</div>
 		<div id="tweenPanel">
-            <h1 id="tweenPanelTitle"> Tween Name - Mode </h1>
+			<h1 id="tweenPanelTitle"> Tween Name - Mode </h1>
 			<canvas id="panelCanvas" width="640" height="430">There should be a canvas here...</canvas>
-			<div id="tweenPanelFormula">Here goes stuff</div>
+            <h2> Mode </h2>
+            <span id="modeNormal">Normal</span>
+            <span id="modeComplement">Complement</span>
+            <span id="modeOut">Out</span>
+            <span id="modeOutComplement">Out Complement</span>
+            <div>
+            </div>
+			<h2> Expression </h2>
+			<div id="tweenPanelFormula" class="expression">Here goes stuff</div>
 		</div>
 	</div>
 </body>

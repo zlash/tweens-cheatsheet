@@ -25,6 +25,8 @@
 
     var currentTween;
 
+    var currentMode = "none";
+
     function plotTweenInCanvas(tweenName, canvas, width, height) {
         canvas.width = width;
         canvas.height = height;
@@ -39,10 +41,9 @@
         ctx.fillRect(0, 0, width, height);
 
         ctx.beginPath();
-        ctx.moveTo(paletteCanvasMargin, paletteCanvasMargin + (1.0 - tween.func(0)) * gHeight);
 
-        for (var i = 1; i < gWidth; i++) {
-            ctx.lineTo(paletteCanvasMargin + i, paletteCanvasMargin + (1.0 - tween.func(i / (gWidth - 1))) * gHeight);
+        for (var i = 0; i < gWidth; i++) {
+            ctx[i == 0 ? "moveTo" : "lineTo"](paletteCanvasMargin + i, paletteCanvasMargin + (1.0 - tween.func(i / (gWidth - 1))) * gHeight);
         }
 
         ctx.stroke();
@@ -84,10 +85,21 @@
 
             document.getElementById("tweenPanelTitle").innerHTML = name;
             document.getElementById("tweenPanelFormula").innerHTML = currentTween.expression;
-            			
-			//<div id="tweenPanelFormula">Here goes stuff</div>
+
+            //<div id="tweenPanelFormula">Here goes stuff</div>
 
         }
+    }
+
+    function setCurrentMode(mod) {
+        currentMode = mod;
+
+        document.getElementById("modeNormal").className = "modeButton" + ((mod==="normal")?" modeButtonOn":"");
+        document.getElementById("modeComplement").className = "modeButton" + ((mod==="complement")?" modeButtonOn":"");
+        document.getElementById("modeOut").className = "modeButton" + ((mod==="out")?" modeButtonOn":"");
+        document.getElementById("modeOutComplement").className = "modeButton" + ((mod==="outComplement")?" modeButtonOn":"");
+
+        setTween(currentTween.name);
     }
 
 
@@ -111,7 +123,11 @@
         ct = ct - Math.floor(ct);
         ct = Math.max(0, Math.min(1, (ct * 2) - 0.5));
 
-        var y = currentTween.func(ct);
+        var y = currentTween.func((currentMode === "out" || currentMode === "outComplement") ? (1 - ct) : ct);
+
+        if (currentMode === "out" || currentMode === "complement") {
+            y = 1 - y;
+        }
 
         ctx.clearRect(0, 0, w, h);
 
@@ -122,9 +138,9 @@
         ////////////////////////////
         ctx.beginPath();
         ctx.fillStyle = "#510273";
-        ctx.arc(505, 100, y * 60, 0, 2 * Math.PI);
+        ctx.arc(505, 100, Math.abs(y * 60), 0, 2 * Math.PI);
         ctx.fillRect(420, 220, 80, y * 150);
-        ctx.fillRect(510, 220 + y * 150, 80, (1-y) * 150);
+        ctx.fillRect(510, 220 + y * 150, 80, (1 - y) * 150);
         ctx.fill();
 
         ////////
@@ -151,10 +167,20 @@
 
         ctx.beginPath();
         ctx.strokeStyle = "#000000";
-        ctx.moveTo(gX + gPadding, gY + gPadding + (1.0 - currentTween.func(0)) * gPH);
 
-        for (var i = 1; i < gPW; i++) {
-            ctx.lineTo(gX + gPadding + i, gY + gPadding + (1.0 - currentTween.func(i / (gPW - 1))) * gPH);
+        for (var i = 0; i < gPW; i++) {
+
+            var lX = i / (gPW - 1);
+
+            if (currentMode === "out" || currentMode === "outComplement") {
+                lX = 1 - lX;
+            }
+
+            var lY = currentTween.func(lX);
+            if (currentMode === "out" || currentMode === "complement") {
+                lY = 1 - lY;
+            }
+            ctx[i == 0 ? "moveTo" : "lineTo"](gX + gPadding + i, gY + gPadding + (1.0 - lY) * gPH);
         }
 
         ctx.stroke();
@@ -179,9 +205,17 @@
     // Init
     window.onload = function () {
         tweens = getTweens();
-        setTween("linear");
         panelCanvas = document.getElementById("panelCanvas");
         generatePaletteCanvases();
+
+        document.getElementById("modeNormal").onclick = function () { setCurrentMode("normal"); };
+        document.getElementById("modeComplement").onclick = function () { setCurrentMode("complement"); };
+        document.getElementById("modeOut").onclick = function () { setCurrentMode("out"); };
+        document.getElementById("modeOutComplement").onclick = function () { setCurrentMode("outComplement"); };
+
+        setTween("linear");
+        setCurrentMode("normal");
+
 
         window.requestAnimationFrame(mainLoop);
     };

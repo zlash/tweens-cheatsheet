@@ -11,26 +11,73 @@ canvas {
     display:flex;    
 }
 
+#leftColumn {
+    display:flex; 
+    flex-direction: column;
+    align-content: flex-start;    
+    order:1;
+    flex: 2;  
+}
+
+#header {
+    order:1;  
+    background:#95A656;
+    padding:15px;
+    padding-top:0px;
+}
+
+#header p{
+    padding:10px;
+}
+
 #tweensPalette {    
-    padding: 25px;    
-    flex: 2;
-    order:1;      
-    height:90vh;      
+    padding: 25px;        
+    order:2;                
     overflow:auto;
     flex-flow: row wrap;
     align-content: flex-start;
     display:flex;
+    height:70vh;
 }
 
 
 #tweenPanel {
     margin: 25px;
+    margin-top: 0px;
     padding: 25px;
+    padding-top: 0px;
     background:#95A656;
     order:2;  
+    
 }
 
 .tweenPaletteEntry {
     cursor: pointer;
-    background:#95A656;
+    background:#95A656;    
+    padding: 10px;
+    margin: 5px;
+    
+    text-align: center;
+    font-weight: bold;
+}
+
+.tweenPaletteEntry canvas{
+    margin-bottom: 10px;    
+}
+
+.expression {
+    background:#B3BF99;
+}
+
+.modeButton {
+    cursor: pointer;
+    background:#B3BF99;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.modeButtonOn {    
+    background:black;
+    color: B3BF99;
 }
