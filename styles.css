@@ -1,0 +1,29 @@
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+canvas {
+    display: block;
+}
+
+#container {
+    display:flex;    
+}
+
+#tweensPalette {    
+    background:red;
+    flex: 2;
+    order:1;      
+    height:95vh;      
+    overflow:auto;
+}
+
+#tweenPanel {
+    background:blue;
+    order:2;  
+}
+
+#tweenPanel canvas{
+    width: 600px;
+    
+}

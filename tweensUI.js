@@ -31,7 +31,6 @@
         var gWidth = width - 2 * paletteCanvasMargin;
         var gHeight = height - 2 * paletteCanvasMargin;
 
-        ctx.clearRect(0, 0, width, height);
         ctx.beginPath();
         ctx.moveTo(paletteCanvasMargin, paletteCanvasMargin + (1.0 - tween.func(0)) * gHeight);
 
@@ -50,8 +49,7 @@
             var div = document.createElement("div");
 
             var canvas = document.createElement("canvas");
-            plotTweenInCanvas(tweenName, canvas, paletteCanvasW, paletteCanvasH);
-            canvas.style.display = "block";
+            plotTweenInCanvas(tweenName, canvas, paletteCanvasW, paletteCanvasH);            
             div.appendChild(canvas);
 
             var span = document.createElement("span");
