@@ -36,7 +36,7 @@
         var gHeight = height - 2 * paletteCanvasMargin;
 
         ctx.fillStyle = "#B3BF99";
-        ctx.fillRect(0,0,width,height);
+        ctx.fillRect(0, 0, width, height);
 
         ctx.beginPath();
         ctx.moveTo(paletteCanvasMargin, paletteCanvasMargin + (1.0 - tween.func(0)) * gHeight);
@@ -81,7 +81,23 @@
     function setTween(name) {
         if (tweens[name]) {
             currentTween = tweens[name];
+
+            document.getElementById("tweenPanelTitle").innerHTML = name;
+            document.getElementById("tweenPanelFormula").innerHTML = currentTween.expression;
+            			
+			//<div id="tweenPanelFormula">Here goes stuff</div>
+
         }
+    }
+
+
+    function strokeLine(ctx, color, width, x0, y0, x1, y1) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
     }
 
     function renderPanel(t) {
@@ -93,20 +109,63 @@
 
         var ct = dt / 2000;
         ct = ct - Math.floor(ct);
-        ct = Math.max(0,Math.min(1,(ct*2)-0.5));
+        ct = Math.max(0, Math.min(1, (ct * 2) - 0.5));
 
         var y = currentTween.func(ct);
 
         ctx.clearRect(0, 0, w, h);
 
-        ctx.fillStyle = "red";
-        ctx.fillRect(0,0,w,h);
-        ctx.fillStyle = "black";
+
+
+        ////////
+        // Plot Indicators
+        ////////////////////////////
+        ctx.beginPath();
+        ctx.fillStyle = "#510273";
+        ctx.arc(505, 100, y * 60, 0, 2 * Math.PI);
+        ctx.fillRect(420, 220, 80, y * 150);
+        ctx.fillRect(510, 220 + y * 150, 80, (1-y) * 150);
+        ctx.fill();
+
+        ////////
+        // Plot graph
+        ////////////////////////////
+        var gX = 10;
+        var gY = 10;
+        var gW = w * 0.6;
+        var gH = gW;
+        var gPadding = 80;
+        var gPW = gW - 2 * gPadding;
+        var gPH = gH - 2 * gPadding;
+
+        ctx.fillStyle = "#B3BF99";
+        ctx.fillRect(gX, gY, gW, gH);
+
+
+        strokeLine(ctx, "#AAAAAA", 2, gX + gW - gPadding, gY, gX + gW - gPadding, gY + gH);
+        strokeLine(ctx, "#AAAAAA", 2, gX, gY + gPadding, gX + gW, gY + gPadding);
+
+        strokeLine(ctx, "#000000", 2, gX, gY + gH - gPadding, gX + gW, gY + gH - gPadding);
+        strokeLine(ctx, "#000000", 2, gX + gPadding, gY, gX + gPadding, gY + gH);
 
 
         ctx.beginPath();
-        ctx.arc(75, 75, y * 50, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#000000";
+        ctx.moveTo(gX + gPadding, gY + gPadding + (1.0 - currentTween.func(0)) * gPH);
+
+        for (var i = 1; i < gPW; i++) {
+            ctx.lineTo(gX + gPadding + i, gY + gPadding + (1.0 - currentTween.func(i / (gPW - 1))) * gPH);
+        }
+
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillStyle = "#510273";
+        ctx.arc(gX + gPadding + ct * gPW, gY + gPadding + (1.0 - y) * gPH, 10, 0, 2 * Math.PI);
         ctx.fill();
+
+
+
     }
 
     function mainLoop(t) {
