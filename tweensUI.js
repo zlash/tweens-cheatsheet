@@ -43,7 +43,7 @@
         ctx.beginPath();
 
         for (var i = 0; i < gWidth; i++) {
-            ctx[i == 0 ? "moveTo" : "lineTo"](paletteCanvasMargin + i, paletteCanvasMargin + (1.0 - tween.func(i / (gWidth - 1))) * gHeight);
+            ctx[i == 0 ? "moveTo" : "lineTo"](paletteCanvasMargin + i, paletteCanvasMargin + (1.0 - tween.func(i / (gWidth - 1), tween.params)) * gHeight);
         }
 
         ctx.stroke();
@@ -79,6 +79,7 @@
         }
     }
 
+
     function setTween(name) {
         if (tweens[name]) {
             currentTween = tweens[name];
@@ -86,7 +87,46 @@
             document.getElementById("tweenPanelTitle").innerHTML = name;
             document.getElementById("tweenPanelFormula").innerHTML = currentTween.expression;
 
-            //<div id="tweenPanelFormula">Here goes stuff</div>
+
+
+            if (currentTween.params) {
+                var newParametersHtml = "";
+
+                for (var paramName in currentTween.params) {
+                    var param = currentTween.params[paramName];
+                    newParametersHtml += "<b>" + paramName + "</b> (" + param.name + ")";
+                    if (param.int) {
+                        newParametersHtml += ' = <b id="param_' + paramName + '_value">' + param.value + "</b><br />";
+                        newParametersHtml += '<input value="' + param.value + '" id="param_' + paramName + '_range" type="range" min="' + param.min + '" max="' + param.max + '"><br />';
+                    } else {
+                        newParametersHtml += ' = <b id="param_' + paramName + '_value">' + param.value.toFixed(2) + "</b><br /> ";
+                        newParametersHtml += '<input value="' + 100 * (param.value - param.min) / (param.max - param.min) + '" id="param_' + paramName + '_range" type="range" min="0" max="100"><br />';
+                    }
+                }
+
+                document.getElementById("parametersDiv").innerHTML = newParametersHtml;
+
+                for (var paramName in currentTween.params) {
+                    var range = document.getElementById('param_' + paramName + '_range');
+                    (function (key, param) {
+                        range.oninput = function () {
+
+                            if (param.int) {
+                                param.value = this.value;
+                                document.getElementById('param_' + paramName + '_value').innerText = this.value;
+                            } else {
+                                param.value = param.min + (param.max - param.min) * (this.value / 100);
+                                document.getElementById('param_' + paramName + '_value').innerText = param.value.toFixed(2);
+                            }
+                        }
+                    })(paramName, currentTween.params[paramName]);
+                }
+
+                document.getElementById("parametersDiv").parentNode.style.display = "block";
+            } else {
+                document.getElementById("parametersDiv").parentNode.style.display = "none";
+            }
+
 
         }
     }
@@ -94,10 +134,10 @@
     function setCurrentMode(mod) {
         currentMode = mod;
 
-        document.getElementById("modeNormal").className = "modeButton" + ((mod==="normal")?" modeButtonOn":"");
-        document.getElementById("modeComplement").className = "modeButton" + ((mod==="complement")?" modeButtonOn":"");
-        document.getElementById("modeOut").className = "modeButton" + ((mod==="out")?" modeButtonOn":"");
-        document.getElementById("modeOutComplement").className = "modeButton" + ((mod==="outComplement")?" modeButtonOn":"");
+        document.getElementById("modeNormal").className = "modeButton" + ((mod === "normal") ? " modeButtonOn" : "");
+        document.getElementById("modeComplement").className = "modeButton" + ((mod === "complement") ? " modeButtonOn" : "");
+        document.getElementById("modeOut").className = "modeButton" + ((mod === "out") ? " modeButtonOn" : "");
+        document.getElementById("modeOutComplement").className = "modeButton" + ((mod === "outComplement") ? " modeButtonOn" : "");
 
         setTween(currentTween.name);
     }
@@ -112,6 +152,16 @@
         ctx.stroke();
     }
 
+    function doCurrentTweenWithModes(t) {
+        var y = currentTween.func((currentMode === "out" || currentMode === "outComplement") ? (1 - t) : t, currentTween.params);
+
+        if (currentMode === "out" || currentMode === "complement") {
+            y = 1 - y;
+        }
+
+        return y;
+    }
+
     function renderPanel(t) {
         var dt = t - baseTime;
         var ctx = panelCanvas.getContext("2d");
@@ -123,25 +173,28 @@
         ct = ct - Math.floor(ct);
         ct = Math.max(0, Math.min(1, (ct * 2) - 0.5));
 
-        var y = currentTween.func((currentMode === "out" || currentMode === "outComplement") ? (1 - ct) : ct);
-
-        if (currentMode === "out" || currentMode === "complement") {
-            y = 1 - y;
-        }
+        var y = doCurrentTweenWithModes(ct);
 
         ctx.clearRect(0, 0, w, h);
-
-
 
         ////////
         // Plot Indicators
         ////////////////////////////
+
         ctx.beginPath();
         ctx.fillStyle = "#510273";
         ctx.arc(505, 100, Math.abs(y * 60), 0, 2 * Math.PI);
         ctx.fillRect(420, 220, 80, y * 150);
         ctx.fillRect(510, 220 + y * 150, 80, (1 - y) * 150);
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#3F0259";
+        ctx.lineWidth = 3;
+        ctx.arc(505, 100, 60, 0, 2 * Math.PI);
+        ctx.strokeRect(420, 220, 80, 150);
+        ctx.strokeRect(510, 220, 80, 150);
+        ctx.stroke();
 
         ////////
         // Plot graph
@@ -161,26 +214,16 @@
         strokeLine(ctx, "#AAAAAA", 2, gX + gW - gPadding, gY, gX + gW - gPadding, gY + gH);
         strokeLine(ctx, "#AAAAAA", 2, gX, gY + gPadding, gX + gW, gY + gPadding);
 
-        strokeLine(ctx, "#000000", 2, gX, gY + gH - gPadding, gX + gW, gY + gH - gPadding);
-        strokeLine(ctx, "#000000", 2, gX + gPadding, gY, gX + gPadding, gY + gH);
+        strokeLine(ctx, "#000000", 1, gX, gY + gH - gPadding, gX + gW, gY + gH - gPadding);
+        strokeLine(ctx, "#000000", 1, gX + gPadding, gY, gX + gPadding, gY + gH);
 
 
         ctx.beginPath();
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = "#3F0259";
+        ctx.lineWidth = 2;
 
         for (var i = 0; i < gPW; i++) {
-
-            var lX = i / (gPW - 1);
-
-            if (currentMode === "out" || currentMode === "outComplement") {
-                lX = 1 - lX;
-            }
-
-            var lY = currentTween.func(lX);
-            if (currentMode === "out" || currentMode === "complement") {
-                lY = 1 - lY;
-            }
-            ctx[i == 0 ? "moveTo" : "lineTo"](gX + gPadding + i, gY + gPadding + (1.0 - lY) * gPH);
+            ctx[i == 0 ? "moveTo" : "lineTo"](gX + gPadding + i, gY + gPadding + (1.0 - doCurrentTweenWithModes(i / (gPW - 1))) * gPH);
         }
 
         ctx.stroke();

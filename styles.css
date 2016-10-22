@@ -81,3 +81,8 @@ canvas {
     background:black;
     color: B3BF99;
 }
+
+#parametersDiv {
+    padding-left:25px;
+    padding-right:25px;
+}

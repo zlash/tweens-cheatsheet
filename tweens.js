@@ -41,7 +41,6 @@ function getTweens() {
         "func": function (t) { return t; }
     });
 
-
     arr.push({
         "name": 'quad',
         "expression": fmt('y = t * t'),
@@ -62,64 +61,107 @@ function getTweens() {
 
     arr.push({
         "name": 'hermite',
-        "expression": fmt('y = t * t * ( 3 - 2 * t )'),
+        "expression": fmt('y = t * t * (3 - 2 * t)'),
         "func": function (t) { return t * t * (3 - 2 * t); }
     });
 
     arr.push({
         "name": 'overshoot hermite',
-        "expression": fmt('y = t * t * ( 3 - 2 * t )'),
-        "func": function (t) {
-            var a = 0.25; // Overshoot factor
-            return (t * t * (3 - 2 * (a + 1) * t)) / (3 - 2 * (a + 1));
+        "expression": fmt('o = 1 + 0.499 * O', 'y = (t * t * (3 - 2 * o * t)) / (3 - 2 * o)'),
+        "params": {
+            "O": {
+                "name": "Overshoot factor",
+                "value": 0.5,
+                "min": 0,
+                "max": 1,
+            }
+        },
+        "func": function (t, p) {
+            var o = 1 + 0.499 * p.O.value;
+            return (t * t * (3 - 2 * o * t)) / (3 - 2 * o);
         }
     });
 
     arr.push({
         "name": 'sine',
-        "expression": fmt('y = sin( t * pi / 2 )'),
+        "expression": fmt('y = sin( t * pi * 0.5 )'),
         "func": function (t) { return Math.sin(t * Math.PI * 0.5); }
     });
 
     arr.push({
         "name": 'overshoot sine',
-        "expression": fmt('y = sin( t * pi / 2 )'),
-        "func": function (t) {
-            var a = 0.3; // Overshoot factor
-            return Math.sin((1 + a) * t * Math.PI * 0.5) / Math.sin((1 + a) * Math.PI * 0.5);
+        "expression": fmt('o = 1 + 0.999 * O', 'y = sin(o * t * pi * 0.5) / sin(o * pi * 0.5)'),
+        "params": {
+            "O": {
+                "name": "Overshoot factor",
+                "value": 0.5,
+                "min": 0,
+                "max": 1,
+            }
+        },
+        "func": function (t, p) {
+            var o = 1 + 0.999 * p.O.value;
+            return Math.sin(o * t * Math.PI * 0.5) / Math.sin(o * Math.PI * 0.5);
         }
     });
 
     arr.push({
         "name": 'step',
-        "expression": fmt('y = floor(t * 5) / 5'),
-        "func": function (t) { return Math.floor(t * 5) / 5; }
+        "expression": fmt('y = floor(t * N) / N'),
+        "params": {
+            "N": {
+                "name": "Number of steps",
+                "value": 4,
+                "min": 1,
+                "max": 20,
+                "int": true
+            }
+        },
+        "func": function (t, p) { return Math.floor(t * p.N.value) / p.N.value; }
     });
 
     arr.push({
         "name": 'circular',
-        "expression": fmt('y = sin( acos( 1 - t) )'),
+        "expression": fmt('y = sin(acos(1 - t))'),
         "func": function (t) { return Math.sin(Math.acos(1 - t)); }
     });
 
     arr.push({
         "name": 'spring',
-        "expression": fmt('y = sin( acos( 1 - t) )'),
-        "func": function (t) {
-            var a = 0.2; //            
+        "expression": fmt(
+            'if t < A {',
+            'y = 2 * (t * t) / (A * A)',
+            '} else {',
+            'nt = (t - A) / (1 - A)',
+            'y = 1 + (1 - nt) * cos(nt * pi * 2 * N)',
+            '}'
+        ),
+        "params": {
+            "N": {
+                "name": "Number of oscilations",
+                "value": 3,
+                "min": 1,
+                "max": 10,
+                "int": true
+            },
+            "A": {
+                "name": "Attack",
+                "value": 0.2,
+                "min": 0.001,
+                "max": 0.999,                
+            }
+        },
+        "func": function (t, p) {
+            var a = p.A.value;
             if (t < a) {
-                nt = t / a;
-                return nt * nt * 2;
+                return 2 * (t * t) / (a * a);
             } else {
                 nt = (t - a) / (1 - a);
-                return 1 +  (1 - nt) * Math.cos(nt * Math.PI * 2 * 3);
+                return 1 + (1 - nt) * Math.cos(nt * Math.PI * 2 * p.N.value);
             }
-
-        } //(1-((1-t)*(1-t)*(1-t)*(1-t)))
+        }
 
     });
-
-
 
 
     var tweens = {};
