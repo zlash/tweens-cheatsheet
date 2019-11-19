@@ -1,0 +1,48 @@
+<html lang="en">
+<meta charset="utf-8" />
+
+<head>
+	<link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+
+<body>
+
+	<script src="tweens.js"></script>
+	<script src="tweensUI.js"></script>
+
+	<div id="container">
+		<div id="leftColumn">
+			<div id="header">
+				<h1>Tweens Cheatsheet</h1>
+				<p> I always keep forgetting the expressions I need to whip up some quick tweens and end up digging old code to look up for
+					them, so I made this mini reference chatsheet to unify them in one place online.</p>
+			</div>
+			<div id="tweensPalette">
+			</div>
+		</div>
+		<div id="tweenPanel">
+			<h1 id="tweenPanelTitle"> Tween Name - Mode </h1>
+			<canvas id="panelCanvas" width="640" height="430">There should be a canvas here...</canvas>
+			<h2> Mode </h2>
+			<span id="modeNormal">Normal</span>
+			<span id="modeComplement">Complement</span>
+			<span id="modeOut">Out</span>
+			<span id="modeOutComplement">Out Complement</span>
+			<div>
+			</div>
+			<div style="display:flex;justify-content:space-between;">
+				<div>
+					<h2> Expression </h2>
+					<div id="tweenPanelFormula" class="expression">Here goes stuff</div>
+				</div>
+				<div>
+					<h2> Parameters </h2>
+					<div id="parametersDiv">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
